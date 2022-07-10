@@ -1,0 +1,10 @@
+.nyc_output
+.semaphore
+tests/
+dist/
+docs/
+node_modules/
+coverage/
+.github/
+dist/
+.eslintrc.js

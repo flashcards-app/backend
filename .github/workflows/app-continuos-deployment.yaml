@@ -1,0 +1,44 @@
+name: CD Workflow
+on:
+  push:
+    branches:
+      - master
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_GCP_ID }}
+  PROJECT_KEYS: ${{ secrets.PROJECT_GCP_KEY }}
+  GITHUB_SHA: ${{ github.sha }}
+  SERVICE: employees-service-backend
+  REGION: europe-west6
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ env.PROJECT_KEYS }}
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and Push Container
+        run: |-
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+          docker images
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  env.GITHUB_SHA }}
+
+      - name: Deploy to Cloud Run
+        run: |-
+          gcloud run deploy $SERVICE \
+            --region $REGION \
+            --image gcr.io/$PROJECT_ID/$SERVICE:$GITHUB_SHA \
+            --platform "managed" \
+            --allow-unauthenticated
