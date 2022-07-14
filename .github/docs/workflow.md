@@ -63,7 +63,7 @@ for first commit in the branch:
 otherwise:
 
 ```shell
- git push (otherwise)
+ git push
 ```
 
 Good job! you have pushed your branch to the remote!
