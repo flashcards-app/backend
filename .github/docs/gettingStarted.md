@@ -69,4 +69,4 @@ npm run dev
 
 Congrats! You have now successfully started the dev server with a MongoDB instance connected to it!
 
-> If you are following the # **Read before you start coding** - guide, you should go to [Our Workflow](./workflow.md) next.
+> If you are following the [# Read before you start coding](../../README.md#read-before-you-start-coding) - guide, you should go to [Our Workflow](./workflow.md) next.
