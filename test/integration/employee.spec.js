@@ -1,6 +1,6 @@
 import request from 'supertest'
 import httpStatus from 'http-status'
-import app from '../../src/index'
+import app from '../../src'
 
 describe('Employee Endpoint [API]', async () => {
     let stub

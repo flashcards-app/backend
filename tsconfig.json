@@ -1,0 +1,26 @@
+{
+    "extends": "@tsconfig/node16/tsconfig.json",
+    "ts-node": {
+        "transpileOnly": true,
+        "files": true
+    },
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "moduleResolution": "Node",
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "lib": ["esnext"],
+        "declaration": false,
+        "removeComments": true,
+        "noUnusedLocals": false,
+        "newLine": "lf",
+        "noImplicitAny": true,
+        "strict": true,
+        "pretty": true,
+        "noEmitOnError": true,
+        "typeRoots": ["./node_modules/@types"],
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules/**"]
+}
