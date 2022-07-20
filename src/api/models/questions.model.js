@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import httpStatus from 'http-status'
-import {omitBy, isNil} from 'lodash'
+import { omitBy, isNil } from 'lodash'
 import APIError from '../utils/APIError'
 
 /**
@@ -8,25 +8,28 @@ import APIError from '../utils/APIError'
  * @private
  */
 const questionsSchema = new mongoose.Schema({
-    isDeleted:     {
-        type:     Boolean,
+    isDeleted: {
+        type: Boolean,
         required: true,
-        default:  false,
+        default: false,
     },
     question: {
+        type: String
+    },
+    subject: {
         type: String
     },
     answer: {
         type: String
     },
-    createdBy:     {
+    createdBy: {
         type: String,
     },
-    updatedBy:     {
+    updatedBy: {
         type: String,
     },
     updateHistory: {
-        type:    Object,
+        type: Object,
         default: [],
     }
 }, {
@@ -40,7 +43,7 @@ const questionsSchema = new mongoose.Schema({
 questionsSchema.method({
     transform() {
         const transformed = {}
-        const fields      = ['isDeleted', 'question', 'answer', 'createdAt']
+        const fields = ['isDeleted', 'subject', 'question', 'answer', 'createdAt']
 
         fields.forEach((field) => {
             transformed[field] = this[field]
@@ -73,7 +76,7 @@ questionsSchema.statics = {
 
             throw new APIError({
                 message: 'Question does not exist',
-                status:  httpStatus.NOT_FOUND,
+                status: httpStatus.NOT_FOUND,
             })
         } catch (error) {
             throw error
@@ -86,12 +89,12 @@ questionsSchema.statics = {
      * @param {number} limit - Limit number of questions to be returned.
      * @returns {Promise<Question[]>}
      */
-    list({page = 1, perPage = 30, name, email, role, isDeleted = false}) {
-        name !== '' && name ? name = {"$regex": name, "$options": "i"} : ''
-        const options = omitBy({name, email, role, isDeleted}, isNil)
+    list({ page = 1, perPage = 30, name, email, role, isDeleted = false }) {
+        name !== '' && name ? name = { "$regex": name, "$options": "i" } : ''
+        const options = omitBy({ name, email, role, isDeleted }, isNil)
 
         return this.find(options)
-            .sort({createdAt: -1})
+            .sort({ createdAt: -1 })
             .skip(perPage * (page - 1))
             .limit(perPage)
             .exec()
