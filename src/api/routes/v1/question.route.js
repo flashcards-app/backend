@@ -14,8 +14,8 @@ router.param('questionId', controller.load)
 
 router
     .route('/')
-    .get(authorize([SUPER_ADMIN, ADMIN]), validate(listQuestions), controller.list)
-    .post(validate(createQuestion), controller.create)
+    .get(authorize(),validate(listQuestions), controller.list)
+    .post(authorize(),validate(createQuestion), controller.create)
 
 router
     .route('/:questionId')

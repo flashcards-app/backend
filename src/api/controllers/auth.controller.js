@@ -32,7 +32,7 @@ const generateTokenResponse = (user, accessToken) => {
  */
 const register = async (req, res, next) => {
     try {
-        req.body.createdBy    = req.user._id
+        req.body.createdBy    = 'registered'
         req.body.updatedBy    = ''
         const userData        = omit(req.body, 'role')
         const user            = await new User(userData).save()
