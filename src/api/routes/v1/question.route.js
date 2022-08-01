@@ -2,7 +2,7 @@ import express from 'express'
 import validate from 'express-validation'
 import * as controller from '../../controllers/questions.controller'
 import {authorize, ADMIN, SUPER_ADMIN} from '../../middlewares/auth'
-import {listQuestions, createQuestion, replaceQuestion, updateQuestion} from '../../validations/questions.validation'
+import {listQuestions, createQuestion, replaceQuestion, updateQuestion, getQuestion} from '../../validations/questions.validation'
 
 const router = express.Router()
 
@@ -19,7 +19,7 @@ router
 
 router
     .route('/:questionId')
-    .get(authorize([ADMIN, SUPER_ADMIN]), validate(updateQuestion), controller.get)
+    .get(authorize([ADMIN, SUPER_ADMIN]), validate(getQuestion), controller.get)
     .put(authorize([SUPER_ADMIN]), validate(replaceQuestion), controller.replace)
     .patch(authorize([SUPER_ADMIN]), validate(updateQuestion), controller.update)
     .delete(authorize([SUPER_ADMIN]), controller.remove)
