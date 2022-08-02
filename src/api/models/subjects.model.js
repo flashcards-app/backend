@@ -53,7 +53,7 @@ subjectsSchema.pre('save', async function save(next) {
 subjectsSchema.method({
     transform() {
         const transformed = {}
-        const fields = ['id', 'isDeleted', 'label', 'title', 'createdAt']
+        const fields = ['isDeleted', 'label', 'title', 'createdAt']
 
         fields.forEach((field) => {
             transformed[field] = this[field]
