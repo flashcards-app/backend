@@ -89,9 +89,9 @@ questionsSchema.statics = {
      * @param {number} limit - Limit number of questions to be returned.
      * @returns {Promise<Question[]>}
      */
-    list({ page = 1, perPage = 30, name, email, role, isDeleted = false }) {
-        name !== '' && name ? name = { "$regex": name, "$options": "i" } : ''
-        const options = omitBy({ name, email, role, isDeleted }, isNil)
+    list({ page = 1, perPage = 30, subject, isDeleted = false }) {
+        // name !== '' && name ? name = { "$regex": name, "$options": "i" } : ''
+        const options = omitBy({ subject, isDeleted }, isNil)
 
         return this.find(options)
             .sort({ createdAt: -1 })

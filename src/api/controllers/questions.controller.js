@@ -117,9 +117,9 @@ const logUpdateHistory = async (req) => {
  */
 export const list = async (req, res, next) => {
     try {
-        const users            = await Questions.list(req.query)
-        const transformedUsers = users.map(user => user.transform())
-        res.json(transformedUsers)
+        const questions            = await Questions.list(req.query)
+        const transformedQuestions = questions.map(question => question.transform())
+        res.json(transformedQuestions)
     } catch (error) {
         next(error)
     }

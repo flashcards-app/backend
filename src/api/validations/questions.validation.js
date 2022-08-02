@@ -17,6 +17,13 @@ export const createQuestion = {
     },
 }
 
+
+export const getQuestion = {
+    params: {
+    questionId: Joi.string().regex(/^[a-fA-F0-9]{24}$/).required(),
+    }
+}
+
 // PUT /v1/questions/:questionId
 export const replaceQuestion = {
     body: {
