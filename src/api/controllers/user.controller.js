@@ -123,11 +123,7 @@ const logUpdateHistory = async (req) => {
                 updatedAt: req.locals.user.updatedAt
             }
             req.locals.user.updatedBy = req.user._id
-            User.findByIdAndUpdate(req.body.id, {'$push': {'updateHistory': lastUpdate}}, {new: true, safe: true},
-                (err, result) => {
-                    if (err)
-                        throw err
-                })
+            await User.findByIdAndUpdate(req.body.id, {'$push': {'updateHistory': lastUpdate}}, {new: true, safe: true}).exec()
         } else {
             req.locals.user.updatedBy = req.user._id
         }
