@@ -4,13 +4,13 @@ import APIError from '../utils/APIError'
 import Questions from '../models/questions.model'
 
 /**
- * Load user and append to req.
+ * Load question and append to req.
  * @public
  */
 export const load = async (req, res, next, id) => {
     try {
-        const user = await Questions.get(id)
-        req.locals = {user}
+        const question = await Questions.get(id)
+        req.locals     = {question}
         return next()
     } catch (error) {
         return next(error)
@@ -18,93 +18,88 @@ export const load = async (req, res, next, id) => {
 }
 
 /**
- * Get user
+ * Get question
  * @public
  */
-export const get = (req, res, next) => {
-    if (req.locals.user.isDeleted === true) {
+export const get    = (req, res, next) => {
+    if (req.locals.question.isDeleted === true) {
         if (req.user.role === 'admin' || req.user.role === 'super-admin') {
-            res.json(req.locals.user.transform())
-        } else {
-            return next(new APIError({
-                message: 'this item is deleted',
-                status:  httpStatus.FORBIDDEN,
-                errors:  [{
-                    message: 'you don\'t have the right permissions to watch deleted items'
-                }]
-            }))
+            return res.json(req.locals.question.transform())
         }
-    } else
-        res.json(req.locals.user.transform())
+
+        return next(new APIError({
+            message: 'this item is deleted',
+            status:  httpStatus.FORBIDDEN,
+            errors:  [{
+                message: 'you don\'t have the right permissions to watch deleted items'
+            }]
+        }))
+    }
+
+    return res.json(req.locals.question.transform())
 }
 /**
- * Create new user
+ * Create new question
  * @public
  */
 export const create = async (req, res, next) => {
     try {
-        const user = new Questions(req.body)
-        const savedUser = await user.save()
-        res.json(savedUser.transform()).status(httpStatus.CREATED)
+        const questions     = new Questions(req.body)
+        const savedQuestion = await questions.save()
+        return res.json(savedQuestion.transform()).status(httpStatus.CREATED)
     } catch (error) {
-        // TODO:
-        console.log(error)
+        next(error)
     }
 }
 
 /**
- * Replace existing user
+ * Replace existing question
  * @public
  */
 export const replace = async (req, res, next) => {
     try {
-        const {user}        = req.locals
-        const newUser       = new Questions(req.body)
-        const ommitRole     = user.role !== 'super-admin' ? 'role' : ''
-        const newUserObject = omit(newUser.toObject(), '_id', ommitRole)
+        const {questions}   = req.locals
+        const newQuestion   = new Questions(req.body)
+        const ommitRole     = questions.role !== 'super-admin' ? 'role' : ''
+        const newQuestionObject = omit(newQuestion.toObject(), '_id', ommitRole)
 
-        await user.updateOne(newUserObject, {override: true, upsert: true})
-        const savedUser = await Questions.findById(user._id)
+        await questions.updateOne(newQuestionObject, {override: true, upsert: true})
+        const savedQuestion = await Questions.findById(questions._id)
 
-        res.json(savedUser.transform())
+        return res.json(savedQuestion.transform())
     } catch (error) {
-        next(Questions.checkDuplicateEmail(error))
+        next(error)
     }
 }
 
 /**
- * Update existing user
+ * Update existing question
  * @public
  */
 export const update = async (req, res, next) => {
-    if (req.user.role !== 'super-admin')
-        req.body.role = 'user'
-    const user = Object.assign(req.locals.user, req.body)
+    const question = Object.assign(req.locals.question, req.body)
     await logUpdateHistory(req)
 
     try {
-        const savedUser = await user.save()
-        res.json(savedUser.transform())
-    } catch (e) {
-        next(Questions.checkDuplicateEmail(e))
+        const savedQuestion = await question.save()
+        return res.json(savedQuestion.transform())
+    } catch (error) {
+        next(error)
     }
 }
 
 const logUpdateHistory = async (req) => {
     try {
-        if (req.locals.user.updatedBy !== '') {
-            const lastUpdate          = {
-                updatedBy: req.locals.user.updatedBy,
-                updatedAt: req.locals.user.updatedAt
+        if (req.locals.question.updatedBy !== '') {
+            const lastUpdate              = {
+                updatedBy: req.locals.question.updatedBy,
+                updatedAt: req.locals.question.updatedAt
             }
-            req.locals.user.updatedBy = req.user._id
-            Questions.findByIdAndUpdate(req.body.id, {'$push': {'updateHistory': lastUpdate}}, {new: true, safe: true},
-                (err, result) => {
-                    if (err)
-                        throw err
-                })
+            req.locals.question.updatedBy = req.user._id
+            await Questions.findByIdAndUpdate(req.body.id, {'$push': {'updateHistory': lastUpdate}},
+                {new: true, safe: true}).exec()
         } else {
-            req.locals.user.updatedBy = req.user._id
+            req.locals.question.updatedBy = req.user._id
         }
     } catch (error) {
         throw error
@@ -112,31 +107,31 @@ const logUpdateHistory = async (req) => {
 }
 
 /**
- * Get user list
+ * Get question list
  * @public
  */
 export const list = async (req, res, next) => {
     try {
         const questions            = await Questions.list(req.query)
         const transformedQuestions = questions.map(question => question.transform())
-        res.json(transformedQuestions)
+        return res.json(transformedQuestions)
     } catch (error) {
         next(error)
     }
 }
 
 /**
- * Delete user
+ * Delete question
  * @public
  */
 export const remove = async (req, res, next) => {
-    const {user}   = req.locals
-    user.isDeleted = req.body.isDeleted
+    const {question}   = req.locals
+    question.isDeleted = req.body.isDeleted
 
     try {
-        await user.save()
-        res.status(httpStatus.NO_CONTENT).end()
-    } catch (e) {
-        next(e)
+        await question.save()
+        return res.status(httpStatus.NO_CONTENT).end()
+    } catch (error) {
+        next(error)
     }
 }
