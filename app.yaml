@@ -1,2 +1,26 @@
 runtime: nodejs16
+env: standard
+entrypoint: npm run start
 
+instance_class: F4_1G
+
+env_variables:
+    NODE_ENV: $NODE_ENV
+    PORT: $PORT
+    MONGO_URI: $MONGO_URI
+    JWT_SECRET: $JWT_SECRET
+    JWT_EXPIRATION_MINUTES: $JWT_EXPIRATION_MINUTES
+    JWT_REFRESH_TOKEN_EXPIRATION_DAYS: $JWT_REFRESH_TOKEN_EXPIRATION_DAYS
+    FRONTEND_URI: $FRONTEND_URI
+    EMAIL_USERNAME: $EMAIL_USERNAME
+    EMAIL_DISPLAY_ADDRESS: $EMAIL_DISPLAY_ADDRESS
+    EMAIL_CLIENT_ID: $EMAIL_CLIENT_ID
+    EMAIL_CLIENT_SECRET: $EMAIL_CLIENT_SECRET
+    EMAIL_REFRESH_TOKEN: $EMAIL_REFRESH_TOKEN
+    EMAIL_REDIRECT_URI: $EMAIL_REDIRECT_URI
+
+automatic_scaling:
+    min_idle_instances: automatic
+    max_idle_instances: automatic
+    min_pending_latency: automatic
+    max_pending_latency: automatic

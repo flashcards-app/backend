@@ -91,7 +91,7 @@ subjectsSchema.statics = {
         }
     },
 
-     /**
+    /**
      * List questions in descending order of 'createdAt' timestamp.
      * @param {number} skip - Number of questions to be skipped.
      * @param {number} limit - Limit number of questions to be returned.

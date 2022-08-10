@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 import {emailConfig, frontendUri} from '../../../config/vars'
 import Email from 'email-templates'
 import {google, gmail_v1} from 'googleapis'
-import {env} from "../../../config/vars"
+import {env, enableEmail} from "../../../config/vars"
 
 const productName = 'Fitness Hub'
 const OAuth2      = google.auth.OAuth2
@@ -14,12 +14,13 @@ const myOAuth2Client = new OAuth2(
 )
 
 
-if (env === 'production')
+if (env === 'production' && enableEmail) {
     myOAuth2Client.setCredentials({
         refresh_token: emailConfig.emailRefreshToken
     })
+}
 
-const accessToken = env === 'production' ? myOAuth2Client.getAccessToken() : ''
+const accessToken = (env === 'production' && enableEmail) ? myOAuth2Client.getAccessToken() : ''
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
