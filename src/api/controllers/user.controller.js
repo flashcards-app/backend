@@ -24,7 +24,7 @@ export const load = async (req, res, next, id) => {
 export const get = (req, res, next) => {
     if (req.locals.user.isDeleted === true) {
         if (req.user.role === 'admin' || req.user.role === 'super-admin') {
-            res.json(req.locals.user.transform())
+            return res.json(req.locals.user.transform())
         } else {
             return next(new APIError({
                 message: 'this item is deleted',
@@ -35,7 +35,7 @@ export const get = (req, res, next) => {
             }))
         }
     } else
-        res.json(req.locals.user.transform())
+        return res.json(req.locals.user.transform())
 }
 
 /**
@@ -53,7 +53,7 @@ export const updateLoggedIn = async (req, res) => {
 
     try {
         const savedUser = await user.save()
-        res.json(savedUser.transform())
+        return res.json(savedUser.transform())
     } catch (error) {
         throw error
     }
@@ -71,7 +71,7 @@ export const create = async (req, res, next) => {
             req.body.role = 'user'
         const user = new User(req.body)
         const savedUser = await user.save()
-        res.json(savedUser.transform()).status(httpStatus.CREATED)
+        return res.json(savedUser.transform()).status(httpStatus.CREATED)
     } catch (error) {
         next(User.checkDuplicateEmail(error))
     }
@@ -91,7 +91,7 @@ export const replace = async (req, res, next) => {
         await user.updateOne(newUserObject, {override: true, upsert: true})
         const savedUser = await User.findById(user._id)
 
-        res.json(savedUser.transform())
+        return res.json(savedUser.transform())
     } catch (error) {
         next(User.checkDuplicateEmail(error))
     }
@@ -109,7 +109,7 @@ export const update = async (req, res, next) => {
 
     try {
         const savedUser = await user.save()
-        res.json(savedUser.transform())
+        return res.json(savedUser.transform())
     } catch (e) {
         next(User.checkDuplicateEmail(e))
     }
@@ -140,7 +140,7 @@ export const list = async (req, res, next) => {
     try {
         const users            = await User.list(req.query)
         const transformedUsers = users.map(user => user.transform())
-        res.json(transformedUsers)
+        return res.json(transformedUsers)
     } catch (error) {
         next(error)
     }

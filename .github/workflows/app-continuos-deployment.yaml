@@ -1,44 +1,47 @@
 name: CD Workflow
 on:
-  push:
-    branches:
-      - master
-      - main
-
-env:
-  PROJECT_ID: ${{ secrets.PROJECT_GCP_ID }}
-  PROJECT_KEYS: ${{ secrets.PROJECT_GCP_KEY }}
-  GITHUB_SHA: ${{ github.sha }}
-  SERVICE: employees-service-backend
-  REGION: europe-west6
+    push:
+        branches:
+            - master
+            - main
 
 jobs:
-  deploy:
-    name: 🚀 Deploy to Cloud Run
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ env.PROJECT_KEYS }}
-
-      - name: Authorize Docker push
-        run: gcloud auth configure-docker
-
-      - name: Build and Push Container
-        run: |-
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
-          docker images
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  env.GITHUB_SHA }}
-
-      - name: Deploy to Cloud Run
-        run: |-
-          gcloud run deploy $SERVICE \
-            --region $REGION \
-            --image gcr.io/$PROJECT_ID/$SERVICE:$GITHUB_SHA \
-            --platform "managed" \
-            --allow-unauthenticated
+    deploy:
+        name: 🚀 Deploy to App Engine
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: setup
+              run: npm install
+            - name: Environment variables injection
+              uses: golang-enthusiast/app-yaml-env-compiler@v1.0
+              env:
+                  NODE_ENV: ${{ secrets.NODE_ENV }}
+                  PORT: ${{ secrets.PORT }}
+                  MONGO_URI: ${{ secrets.MONGO_URI }}
+                  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+                  JWT_EXPIRATION_MINUTES: ${{ secrets.JWT_EXPIRATION_MINUTES }}
+                  JWT_REFRESH_TOKEN_EXPIRATION_DAYS: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRATION_DAYS }}
+                  FRONTEND_URI: ${{ secrets.FRONTEND_URI }}
+                  EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+                  EMAIL_DISPLAY_ADDRESS: ${{ secrets.EMAIL_DISPLAY_ADDRESS }}
+                  EMAIL_CLIENT_ID: ${{ secrets.EMAIL_CLIENT_ID }}
+                  EMAIL_CLIENT_SECRET: ${{ secrets.EMAIL_CLIENT_SECRET }}
+                  EMAIL_REFRESH_TOKEN: ${{ secrets.EMAIL_REFRESH_TOKEN }}
+                  EMAIL_REDIRECT_URI: ${{ secrets.EMAIL_REDIRECT_URI }}
+            - name: List dependencies
+              run: npm list
+            - name: build
+              run: npm run build
+            - name: Deploy to App Engine
+              id: deploy
+              uses: google-github-actions/deploy-appengine@v0.2.0
+              with:
+                  deliverables: app.yaml
+                  project_id: ${{ secrets.PROJECT_RECIPES_GCP_ID }}
+                  credentials: ${{ secrets.PROJECT_RECIPES_GCP_KEY }}
+                  promote: false
+                  version: v1
+            - name: Show Output
+              run: echo ${{ steps.deploy.outputs.url }}
