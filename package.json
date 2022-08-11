@@ -2,7 +2,7 @@
     "name": "flashcards-app-backend",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "src/index.js",
     "engines": {
         "node": "16.x"
     },
@@ -15,9 +15,7 @@
         "test": "cross-env NODE_ENV=test mocha --reporter=landing --config test/.mocharc.js --timeout 20000 --exit test/**/*.spec.js",
         "docker:start": "node ./dist/index.js",
         "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up",
-        "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-        "prestart": "npm run docs && npm run build",
-        "docs": "cross-env apidoc -i src -o docs"
+        "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up"
     },
     "repository": {
         "type": "git",
@@ -30,6 +28,7 @@
     },
     "homepage": "https://github.com/flashcards-app/backend\",#readme",
     "dependencies": {
+        "@babel/runtime": "^7.18.3",
         "axios": "^0.27.2",
         "bcryptjs": "2.4.3",
         "bluebird": "^3.5.0",
@@ -72,7 +71,6 @@
         "@babel/plugin-transform-runtime": "^7.14.5",
         "@babel/preset-env": "^7.14.7",
         "@babel/register": "^7.14.5",
-        "@babel/runtime": "^7.0.0-beta.55",
         "@types/chai": "^4.2.21",
         "@types/express": "^4.17.13",
         "apidoc": "^0.17.5",

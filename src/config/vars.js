@@ -24,6 +24,7 @@ module.exports = {
     },
     mfpApiUri:                         process.env.MFP_API_URI,
     logs:                              process.env.NODE_ENV === 'production' ? 'combined' : 'dev',
+    enableEmail:                       false,
     emailConfig:                       {
         productName:         process.env.PRODUCT_NAME,
         username:            process.env.EMAIL_USERNAME,

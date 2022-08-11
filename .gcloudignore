@@ -20,3 +20,6 @@ node_modules/
 logs/
 .github/
 test/
+
+.env.example
+.env.production
