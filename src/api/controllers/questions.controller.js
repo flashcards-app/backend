@@ -44,6 +44,8 @@ export const get    = (req, res, next) => {
  */
 export const create = async (req, res, next) => {
     try {
+        req.body.createdBy    = req.user._id
+        req.body.updatedBy    = ''
         const questions     = new Questions(req.body)
         const savedQuestion = await questions.save()
         return res.json(savedQuestion.transform()).status(httpStatus.CREATED)

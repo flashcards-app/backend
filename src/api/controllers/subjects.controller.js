@@ -37,15 +37,18 @@ export const get    = (req, res, next) => {
 
     return res.json(req.locals.subject.transform())
 }
+
 /**
  * Create new subject
  * @public
  */
 export const create = async (req, res, next) => {
     try {
-        const question      = new Subjects(req.body)
-        const savedQuestion = await question.save()
-        return res.json(savedQuestion.transform()).status(httpStatus.CREATED)
+        req.body.createdBy    = req.user._id
+        req.body.updatedBy    = ''
+        const subject      = new Subjects(req.body)
+        const savedSubject = await subject.save()
+        return res.json(savedSubject.transform()).status(httpStatus.CREATED)
     } catch (error) {
         // TODO:
         console.log(error)
@@ -53,7 +56,7 @@ export const create = async (req, res, next) => {
 }
 
 /**
- * Replace existing question
+ * Replace existing subject
  * @public
  */
 export const replace = async (req, res, next) => {
