@@ -43,7 +43,7 @@ const questionsSchema = new mongoose.Schema({
 questionsSchema.method({
     transform() {
         const transformed = {}
-        const fields = ['isDeleted', 'subject', 'question', 'answer', 'createdAt']
+        const fields = ['id', 'isDeleted', 'subject', 'question', 'answer', 'createdAt']
 
         fields.forEach((field) => {
             transformed[field] = this[field]
@@ -82,6 +82,7 @@ questionsSchema.statics = {
             throw error
         }
     },
+
 
     /**
      * List questions in descending order of 'createdAt' timestamp.

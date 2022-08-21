@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import {displayInOptions} from "../models/userQuestions.model";
 
 // GET /v1/questions
 export const listQuestions = {
@@ -6,6 +7,20 @@ export const listQuestions = {
         page:    Joi.number().min(1),
         perPage: Joi.number().min(1).max(100),
     },
+}
+
+// GET /v1/questions/my
+export const listLoggedIn = {
+    query: {
+        page:    Joi.number().min(1),
+        perPage: Joi.number().min(1).max(100),
+        subject: Joi.string().required(),
+    },
+}
+
+export const addUserQuestion = {
+    questionId: Joi.string().regex(/^[a-fA-F0-9]{24}$/).required(),
+    displayIn:  Joi.string().valid(...displayInOptions).required(),
 }
 
 // POST /v1/questions

@@ -7,6 +7,7 @@ import {jwtExpirationInterval} from '../../config/vars'
 import {omit} from 'lodash'
 import APIError from '../utils/APIError'
 import emailProvider from '../services/emails/emailProvider'
+import UserQuestions from "../models/userQuestions.model";
 
 /**
  * Returns a formatted object with tokens.
@@ -38,6 +39,7 @@ const register = async (req, res, next) => {
         const user            = await new User(userData).save()
         const userTransformed = user.transform()
         const token           = generateTokenResponse(user, user.token())
+        await new UserQuestions({_id: user._id}).save()
         res.status(httpStatus.CREATED)
         return res.json({token, user: userTransformed})
     } catch (error) {
