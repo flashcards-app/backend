@@ -2,6 +2,8 @@ import httpStatus from 'http-status'
 import {omit} from 'lodash'
 import APIError from '../utils/APIError'
 import Questions from '../models/questions.model'
+import UserQuestions from "../models/userQuestions.model";
+import moment from "moment-timezone";
 
 /**
  * Load question and append to req.
@@ -21,7 +23,7 @@ export const load = async (req, res, next, id) => {
  * Get question
  * @public
  */
-export const get    = (req, res, next) => {
+export const get = (req, res, next) => {
     if (req.locals.question.isDeleted === true) {
         if (req.user.role === 'admin' || req.user.role === 'super-admin') {
             return res.json(req.locals.question.transform())
@@ -38,14 +40,15 @@ export const get    = (req, res, next) => {
 
     return res.json(req.locals.question.transform())
 }
+
 /**
  * Create new question
  * @public
  */
 export const create = async (req, res, next) => {
     try {
-        req.body.createdBy    = req.user._id
-        req.body.updatedBy    = ''
+        req.body.createdBy  = req.user._id
+        req.body.updatedBy  = ''
         const questions     = new Questions(req.body)
         const savedQuestion = await questions.save()
         return res.json(savedQuestion.transform()).status(httpStatus.CREATED)
@@ -60,9 +63,9 @@ export const create = async (req, res, next) => {
  */
 export const replace = async (req, res, next) => {
     try {
-        const {questions}   = req.locals
-        const newQuestion   = new Questions(req.body)
-        const ommitRole     = questions.role !== 'super-admin' ? 'role' : ''
+        const {questions}       = req.locals
+        const newQuestion       = new Questions(req.body)
+        const ommitRole         = questions.role !== 'super-admin' ? 'role' : ''
         const newQuestionObject = omit(newQuestion.toObject(), '_id', ommitRole)
 
         await questions.updateOne(newQuestionObject, {override: true, upsert: true})
@@ -117,6 +120,32 @@ export const list = async (req, res, next) => {
         const questions            = await Questions.list(req.query)
         const transformedQuestions = questions.map(question => question.transform())
         return res.json(transformedQuestions)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const listLoggedIn = async (req, res, next) => {
+    try {
+        const questions            = await UserQuestions.listUserQuestions(req.user._id, req.query)
+        const transformedQuestions = questions.map(question => question.transform())
+        return res.json(transformedQuestions)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const addUserQuestion = async (req, res, next) => {
+    try {
+        const question            = await Questions.findOne({'_id': req.body.questionId}).exec()
+        const shouldBeDisplayedIn = req.body.displayIn === 'never' ? [200, 'years'] : [1, req.body.displayIn]
+        const userQuestion        = {
+            id:                  question._id,
+            subject:             question.subject,
+            shouldBeDisplayedIn: moment().add(...shouldBeDisplayedIn).toISOString()
+        }
+        const addedUserQuestion   = UserQuestions.addQuestion(req.user._id, userQuestion)
+        return res.json(addedUserQuestion)
     } catch (error) {
         next(error)
     }

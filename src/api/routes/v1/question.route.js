@@ -2,7 +2,14 @@ import express from 'express'
 import validate from 'express-validation'
 import * as controller from '../../controllers/questions.controller'
 import {authorize, ADMIN, SUPER_ADMIN} from '../../middlewares/auth'
-import {listQuestions, createQuestion, replaceQuestion, updateQuestion, getQuestion} from '../../validations/questions.validation'
+import {
+    listQuestions,
+    listLoggedIn,
+    createQuestion,
+    replaceQuestion,
+    updateQuestion,
+    getQuestion, addUserQuestion
+} from '../../validations/questions.validation'
 
 const router = express.Router()
 
@@ -14,8 +21,13 @@ router.param('questionId', controller.load)
 
 router
     .route('/')
-    .get(authorize(),validate(listQuestions), controller.list)
-    .post(authorize(),validate(createQuestion), controller.create)
+    .get(authorize(), validate(listQuestions), controller.list)
+    .post(authorize(), validate(createQuestion), controller.create)
+
+router
+    .route('/my')
+    .get(authorize(), validate(listLoggedIn), controller.listLoggedIn)
+    .post(authorize(), validate(addUserQuestion), controller.addUserQuestion)
 
 router
     .route('/:questionId')
