@@ -1,4 +1,4 @@
-# anki-backend
+# flashcards-backend
 
 ## Read before you start coding
 
