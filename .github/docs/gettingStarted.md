@@ -5,8 +5,8 @@
 run the following commands in your CLI:
 
 ```shell
-git clone git@github.com:flashcards-app/backend.git anki-backend
-cd anki-backend
+git clone git@github.com:flashcards-app/backend.git flashcards-backend
+cd flashcards-backend
 npm install
 npm i -g @babel/node@7.13.13  @babel/cli@7.13.14
 ```
